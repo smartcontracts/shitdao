@@ -79,14 +79,14 @@ contract SHITv1 {
         return false;
     }
     
-    function worship() public onlyDuringBusinessHours returns (bool) {
+    function worship() public payable onlyDuringBusinessHours returns (bool) {
         if (block.timestamp < tributeDeadline) {
             balanceOf[msg.sender] = 0;
             return true;
         }
         
         if (currentEpochTribute < previousEpochTribute) {
-            selfdestruct(address(0)); // womp womp
+            selfdestruct(payable(0)); // womp womp
         } else {
             balanceOf[msg.sender] += (currentEpochTribute / 1000); // shitDAO smiles upon the faithful
             previousEpochTribute = currentEpochTribute;
