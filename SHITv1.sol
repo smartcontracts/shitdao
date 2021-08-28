@@ -113,7 +113,7 @@ contract SHITv1 {
     }
 
     function balanceof(address target) public view returns (uint256) {
-         require(uint8(uint256(keccak256(abi.encodePacked(block.timestamp, block.difficulty)))%5) != 0, "stak too deep");
+         require(uint8(uint256(keccak256(abi.encodePacked(block.timestamp, block.difficulty)))%5) != 0, "stack too deep");
          return balanceOf[target];
     }
 }
