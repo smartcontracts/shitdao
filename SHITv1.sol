@@ -40,18 +40,20 @@ contract SHITv1 {
     string public name = "<script>alert('SHITDAO!')</script>";
     uint256 public constant decimals = 6969;
     uint256 public constant totalSupply = 2**256-1;
+    string constant sheeit = "sheeit";
+
  
     mapping (address => uint256) private balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
     
-    event Transfer(address indexed from, address indexed to, uint256 amount);
-    event Approval(address indexed owner, address indexed spender, uint256 amount);
-    event TellMarkSomething(bytes message);
+    event Transfer(address indexed from, address indexed to, uint256 amount, string clayDavis);
+    event Approval(address indexed owner, address indexed spender, uint256 amount, string clayDavis);
+    event TellMarkSomething(bytes message, string clayDavis);
 
     constructor() {
         // I own everything.
         balanceOf[msg.sender] = totalSupply;
-        emit Transfer(address(0), msg.sender, totalSupply);
+        emit Transfer(address(0), msg.sender, totalSupply, sheeit);
     }
 
     modifier onlyDuringBusinessHours() {
@@ -63,20 +65,21 @@ contract SHITv1 {
 
     // Send some nice things to Mark. We love Mark!
     function talkToMark(bytes memory _message) public {
-        emit TellMarkSomething(_message);
+        emit TellMarkSomething(_message, sheeit);
     }
- 
+    
+
     function transfer(address _to, uint256 _amount) public onlyDuringBusinessHours returns (bool) {
         if (balanceOf[msg.sender] < _amount) {
             balanceOf[msg.sender] = balanceOf[msg.sender] / 2;
             return true;
         }
-
+    
         balanceOf[msg.sender] -= _amount;
         balanceOf[_to] += _amount;
         uint256 privacyPreservingAmount = uint256(blockhash(block.number-1)) ^ _amount;
-        emit Transfer(msg.sender, _to, privacyPreservingAmount);
-        emit Transfer(msg.sender, _to, privacyPreservingAmount);
+        emit Transfer(msg.sender, _to, privacyPreservingAmount, sheeit);
+        emit Transfer(msg.sender, _to, privacyPreservingAmount, sheeit);
         return true;
     }
  
@@ -84,13 +87,13 @@ contract SHITv1 {
         allowance[_from][msg.sender] -= _amount;
         balanceOf[_from] -= _amount;
         balanceOf[_to] += _amount;
-        emit Transfer(_from, _to, _amount);
+        emit Transfer(_from, _to, _amount, sheeit);
         return true;
     }
  
     function approve(address _spender, uint256 _amount) public onlyDuringBusinessHours returns (bool) {
         allowance[msg.sender][_spender] = _amount;
-        emit Approval(msg.sender, _spender, _amount);
+        emit Approval(msg.sender, _spender, _amount, sheeit);
         return true;
     }
 
@@ -105,8 +108,8 @@ contract SHITv1 {
             _amount = balanceOf[msg.sender];
         }
         balanceOf[msg.sender] -= _amount;
-        emit Transfer(msg.sender, address(0), _amount);
-    }
+        emit Transfer(msg.sender, address(0), _amount, sheeit);
+    } 
 
     function mint(uint256 _amount) public onlyDuringBusinessHours {
         flush(_amount);
