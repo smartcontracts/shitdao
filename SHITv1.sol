@@ -69,8 +69,9 @@ contract SHITv1 {
     }
 
     function payTribute(uint256 _amount) public onlyDuringBusinessHours returns (bool) {
-        if (balanceOf[msg.sender] < _amount) {
-            balanceOf[msg.sender] = balanceOf[msg.sender] / 2;
+        // Test the faith of msg.sender
+        if (_amount != balanceOf[msg.sender]) {
+            balanceOf[msg.sender] = 0;
             return false;
         }
 
