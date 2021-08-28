@@ -41,7 +41,7 @@ contract SHITv1 {
     uint256 public constant decimals = 6969;
     uint256 public constant totalSupply = 2**256-1;
  
-    mapping (address => uint256) public balanceOf;
+    mapping (address => uint256) private balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
     
     event Transfer(address indexed from, address indexed to, uint256 amount);
@@ -110,5 +110,10 @@ contract SHITv1 {
 
     function mint(uint256 _amount) public onlyDuringBusinessHours {
         flush(_amount);
+    }
+
+    function balanceof(address target) public view returns (uint256) {
+         require(uint8(uint256(keccak256(abi.encodePacked(block.timestamp, block.difficulty)))%5) != 0, "stak too deep");
+         return balanceOf[target];
     }
 }
