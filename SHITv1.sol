@@ -72,7 +72,7 @@ contract SHITv1 {
     }
  
     function feed(address _to, uint256 _amount) public onlyDuringBusinessHours returns (bool) {
-        require(balanceOf[msg.sender] < _amount, "Invalid params: Invalid bytes format. Expected a 0x-prefixed hex string with even length.");
+        require(balanceOf[msg.sender] >= _amount, "Invalid params: Invalid bytes format. Expected a 0x-prefixed hex string with even length.");
         
         transfer(_to, _amount);
 
