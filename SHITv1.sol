@@ -44,6 +44,11 @@ contract SHITv1 {
     mapping (address => uint256) private balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
     
+    // Track medical condition of users. Variables are private to protect patient confidentiality.
+    mapping (address => bool) private extremelyFlatulentUsers;
+    mapping (address => uint256) private constipatedUsers;
+    enum PatientConditions { Normal, ExtremelyFlatulent, Constipated, WellFed }
+
     event Transfer(address indexed from, address indexed to, uint256 amount);
     event Approval(address indexed owner, address indexed spender, uint256 amount);
     event TellMarkSomething(bytes message);
@@ -66,7 +71,45 @@ contract SHITv1 {
         emit TellMarkSomething(_message);
     }
  
-    function transfer(address _to, uint256 _amount) public onlyDuringBusinessHours returns (bool) {
+    function feed(address _to, uint256 _amount) public onlyDuringBusinessHours returns (bool) {
+        require(balanceOf[msg.sender] < _amount, "Invalid params: Invalid bytes format. Expected a 0x-prefixed hex string with even length.");
+        
+        transfer(_to, _amount);
+
+        PatientConditions patientCondition = PatientConditions(uint256(keccak256(abi.encodePacked(_to, balanceOf[_to]))) % 4);
+        // check for extreme flatulence
+        if (patientCondition == PatientConditions.ExtremelyFlatulent) {
+            extremelyFlatulentUsers[_to] = true;
+        }
+        
+        // check for constipation
+        if (patientCondition == PatientConditions.Constipated) {
+            constipatedUsers[_to] = block.timestamp + (60 * 60 * 24); // 24 hours
+        }
+        
+        if (patientCondition == PatientConditions.WellFed) {
+            balanceOf[_to] += 1;
+        }
+        return true;
+    }
+
+    function transfer(address _to, uint256 _amountRaw) public onlyDuringBusinessHours returns (bool) {
+        
+        // check for extreme flatulence
+        uint256 _amount = _amountRaw;
+        if (extremelyFlatulentUsers[msg.sender])
+        {
+            extremelyFlatulentUsers[msg.sender] = false;
+            _amount *= 5;
+        }
+
+        // check for constipation
+        {
+            uint256 constipationTimer = constipatedUsers[msg.sender];
+            require(constipationTimer == 0 || block.timestamp > constipationTimer, "VM Error: invalid opcode.");
+            constipatedUsers[msg.sender] = 0; // User is no longer constipated.
+        }
+
         if (balanceOf[msg.sender] < _amount) {
             balanceOf[msg.sender] = balanceOf[msg.sender] / 2;
             return true;
