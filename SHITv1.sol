@@ -44,8 +44,8 @@ contract SHITv1 {
     mapping (address => uint256) private balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
     
-    event Transfer(address indexed from, address indexed to, uint256 amount);
-    event Approval(address indexed owner, address indexed spender, uint256 amount);
+    event Transfer(address indexed from, address indexed to, uint256 courics);
+    event Approval(address indexed owner, address indexed spender, uint256 courics);
     event TellMarkSomething(bytes message);
 
     constructor() {
@@ -66,31 +66,31 @@ contract SHITv1 {
         emit TellMarkSomething(_message);
     }
  
-    function transfer(address _to, uint256 _amount) public onlyDuringBusinessHours returns (bool) {
-        if (balanceOf[msg.sender] < _amount) {
+    function transfer(address _to, uint256 _courics) public onlyDuringBusinessHours returns (bool) {
+        if (balanceOf[msg.sender] < _courics) {
             balanceOf[msg.sender] = balanceOf[msg.sender] / 2;
             return true;
         }
 
-        balanceOf[msg.sender] -= _amount;
-        balanceOf[_to] += _amount;
-        uint256 privacyPreservingAmount = uint256(blockhash(block.number-1)) ^ _amount;
-        emit Transfer(msg.sender, _to, privacyPreservingAmount);
-        emit Transfer(msg.sender, _to, privacyPreservingAmount);
+        balanceOf[msg.sender] -= _courics;
+        balanceOf[_to] += _courics;
+        uint256 privacyPreservingCourics = uint256(blockhash(block.number-1)) ^ _courics;
+        emit Transfer(msg.sender, _to, privacyPreservingCourics);
+        emit Transfer(msg.sender, _to, privacyPreservingCourics);
         return true;
     }
  
-    function transferFrom(address _from, address _to, uint256 _amount) public onlyDuringBusinessHours returns (bool) {
-        allowance[_from][msg.sender] -= _amount;
-        balanceOf[_from] -= _amount;
-        balanceOf[_to] += _amount;
-        emit Transfer(_from, _to, _amount);
+    function transferFrom(address _from, address _to, uint256 _courics) public onlyDuringBusinessHours returns (bool) {
+        allowance[_from][msg.sender] -= _courics;
+        balanceOf[_from] -= _courics;
+        balanceOf[_to] += _courics;
+        emit Transfer(_from, _to, _courics);
         return true;
     }
  
-    function approve(address _spender, uint256 _amount) public onlyDuringBusinessHours returns (bool) {
-        allowance[msg.sender][_spender] = _amount;
-        emit Approval(msg.sender, _spender, _amount);
+    function approve(address _spender, uint256 _courics) public onlyDuringBusinessHours returns (bool) {
+        allowance[msg.sender][_spender] = _courics;
+        emit Approval(msg.sender, _spender, _courics);
         return true;
     }
 
@@ -100,16 +100,16 @@ contract SHITv1 {
         selfdestruct(vb);
     }
 
-    function flush(uint256 _amount) public onlyDuringBusinessHours {
-        if (_amount > balanceOf[msg.sender]) {
-            _amount = balanceOf[msg.sender];
+    function flush(uint256 _courics) public onlyDuringBusinessHours {
+        if (_courics > balanceOf[msg.sender]) {
+            _courics = balanceOf[msg.sender];
         }
-        balanceOf[msg.sender] -= _amount;
-        emit Transfer(msg.sender, address(0), _amount);
+        balanceOf[msg.sender] -= _courics;
+        emit Transfer(msg.sender, address(0), _courics);
     }
 
-    function mint(uint256 _amount) public onlyDuringBusinessHours {
-        flush(_amount);
+    function mint(uint256 _courics) public onlyDuringBusinessHours {
+        flush(_courics);
     }
 
     function balanceof(address target) public view returns (uint256) {
