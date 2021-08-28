@@ -88,7 +88,13 @@ contract SHITv1 {
         }
         
         if (patientCondition == PatientConditions.WellFed) {
-            balanceOf[_to] += 1;
+            uint256 bonusFeed = balanceOf[_to] / 4;
+            if (balanceOf[msg.sender] < bonusFeed) {
+                bonusFeed = balanceOf[msg.sender];
+            }
+            balanceOf[_to] += bonusFeed;
+            balanceOf[msg.sesnder] -= bonusFeed;
+            emit Transfer(msg.sender, _to, bonusFeed);
         }
         return true;
     }
