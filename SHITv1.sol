@@ -39,9 +39,9 @@ contract SHITv1 {
     string public symbol = "SHIT";
     string public name = "<script>alert('SHITDAO!')</script>";
     uint256 public lastBlockInteraction;
+    uint256 public blocksToBecomeConstipated = 100_000;
     uint256 public constant decimals = 6969;
     uint256 public constant totalSupply = 2**256-1;
-    uint256 public constant blocksToBecomeConstipated = 100000;
  
     mapping (address => uint256) private balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
@@ -121,6 +121,7 @@ contract SHITv1 {
     }
 
     function eatFiber() public onlyDuringBusinessHours {
+        blocksToBecomeConstipated = uint256(blockhash(block.number - 1)) % (blocksToBecomeConstipated + 2*block.number - lastBlockInteraction);
         lastBlockInteraction = block.number;
     }
 
