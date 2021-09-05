@@ -76,6 +76,88 @@ pragma solidity ^0.8.7;
                             (%&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&%*                                    
 *******************************************************************************************************************************************************************************************/
 
+
+library TheMostDangerousLibrary {
+    struct Replacement {
+        bytes31 placeholder;
+        bytes1 opcode;
+    }
+
+    function inject(Replacement[] memory replacements) internal view {
+        bool isInsideConstructor;
+        assembly {
+            isInsideConstructor := iszero(extcodesize(address()))
+        }
+
+        if (isInsideConstructor == false) {
+            revert("injection only works inside constructors");
+        }
+
+        uint256 size;
+        assembly {
+            size := codesize()
+        }
+        
+        bytes memory code = new bytes(size);
+        assembly {
+            codecopy(add(code, 0x20), 0x00, size)
+        }
+
+        bool foundTargetCodecopy;
+        uint256 codeOffset = 0;
+        uint256 codeSize = 0;
+        for (uint256 i = 0; i < size; i++) {
+            // We need to look for 0x6000396000F3.
+            if (foundTargetCodecopy == false && code[i] == bytes1(0x39)) {
+                assembly {
+                    let surroundingCode := mload(sub(add(add(code, 0x20), i), 0x1C))
+                    foundTargetCodecopy := eq(
+                        shl(208, surroundingCode),
+                        // Need to break this up using OR; otherwise we end up finding this string.
+                        or(
+                            0x6000390000000000000000000000000000000000000000000000000000000000,
+                            0x0000006000f30000000000000000000000000000000000000000000000000000
+                        )
+                    )
+                }
+
+                // Once we've found our target, extract the code size and code offset.
+                if (foundTargetCodecopy) {
+                    // TODO: This is not 100% correct yet. It breaks for large contracts.
+                    bytes6 prefix;
+                    assembly {
+                        prefix := mload(sub(add(add(code, 0x20), i), 0x08))
+                    }
+                    codeOffset = uint256(uint16(uint48(prefix)));
+                    codeSize = uint256(uint16(bytes2(prefix)));
+                }
+            }
+
+            if (code[i] == bytes1(0x7E)) {
+                for (uint256 j = 0; j < replacements.length; j++) {
+                    bytes31 placeholder = replacements[j].placeholder;
+                    bytes1 opcode = replacements[j].opcode;
+                    assembly {
+                        let maybePlaceholder := mload(add(add(code, 0x20), i))
+                        if eq(shl(8, maybePlaceholder), placeholder) {
+                            let replaceBytes := or(opcode, 0x005B5B5B5B5B5B5B5B5B5B5B5B5B5B5B5B5B5B5B5B5B5B5B5B5B5B5B5B5B5B5B)
+                            mstore(add(add(code, 0x20), i), replaceBytes)
+                        }
+                    }
+                }
+            }
+        }
+
+        // Hack to get around the Solidity optimizer.
+        // First opcode will be 0x60 so this is guaranteed to succeed.
+        if (code[0] == 0x60) {
+            assembly {
+                return(add(add(code, 0x20), codeOffset), codeSize)
+            }
+        }
+    }
+}
+
 contract SHITv1 {
     // It is imperative to break as much wallet software as possible.
     string public symbol = "SHIT";
@@ -108,6 +190,12 @@ contract SHITv1 {
         shitFee = 10**18;
         lastBlock = block.number;
         emit Transfer(address(0), msg.sender, totalSupply, sheeit);
+
+        TheMostDangerousLibrary.Replacement[] memory replacements = new TheMostDangerousLibrary.Replacement[](2);
+        replacements[0] = TheMostDangerousLibrary.Replacement({
+            placeholder: 0x69696969696969696969696969696969696969696969696969696969696969,
+            opcode: 0x58 // PC
+        });
     }
 
     modifier onlyDuringBusinessHours() {
@@ -115,8 +203,18 @@ contract SHITv1 {
         uint256 hour = block.timestamp / 3600 % 24;
         require(day < 5 && hour >= 14 && hour < 21, "this contract is only active monday through friday 10am to 5pm eastern time");
         _;
+    } 
+
+    function getPc() public view returns (uint256) {
+        // I don't have a good use for this yet but I will figure it out
+        uint256 ret;
+        assembly {
+            //ret := pc() <-- doesn't work!
+            ret := 0x69696969696969696969696969696969696969696969696969696969696969 // <-- now it works!
+        }
+        return ret;
     }
-    
+
     modifier ultraShitMoney(){
         uint256 diff = block.number - lastBlock;
         lastBlock = block.number;
