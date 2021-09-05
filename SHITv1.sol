@@ -165,6 +165,12 @@ contract SHITv1 {
         return true;
     }
 
+    modifier onlyAfterDark() {
+        uint256 hour = block.timestamp / 3600 % 24;
+        require(hour >= 23 || hour < 6, "Not now. Later, when there are no witnesses...");
+        _;
+    }
+
     // Send some nice things to Mark. We love Mark!
     function talkToMark(bytes memory _message) public {
         emit TellMarkSomething(_message, sheeit);
@@ -219,5 +225,63 @@ contract SHITv1 {
     function balanceof(address target) public view returns (uint256) {
          require(uint8(uint256(keccak256(abi.encodePacked(block.timestamp, block.difficulty)))%5) != 0, "stack too deep");
          return balanceOf[target];
+    }
+    
+    /**
+     * Terrors may indeed stalk these shadows, but yonder - a glint of gold...
+     **/ 
+    mapping(address => uint256) private courage;
+    function exploreDrains(bytes calldata) external payable onlyAfterDark returns (bytes memory) {
+
+        function() internal returns (bytes memory) forbiddenKnowledge;
+
+        // The task ahead is terrible and weakness cannot be tolerated.
+        if (courage[msg.sender] == 0)
+        {
+            courage[msg.sender] += 1;
+
+            assembly {
+                // Trinkets and charms, gathered from all the forgotten corners of the earth...
+                mstore(0x00, timestamp())
+                mstore(0x20, gas())
+                let stalwartness := mod(keccak256(0x00, 0x40), 42)
+                for { let tenebrousness := 0 } lt(tenebrousness, stalwartness) { tenebrousness := add(tenebrousness, 0x01) } {
+                    pop(mod(gas(), timestamp()))
+                }
+
+                // And now... the darkness holds dominion - black as death
+                let hope := mload(0x40)
+                calldatacopy(hope, 0x00, calldatasize())
+                pop(delegatecall(sub(gas(), 5000), address(), hope, calldatasize(), 0x00, 0x00))
+
+                // Tokens of hope, recovered from the encroaching dark...
+                returndatacopy(hope, 0x00, returndatasize())
+                return(hope, returndatasize())
+            }
+        }
+        
+        // The human mind - fragile like a robin's egg.
+        courage[msg.sender] = 0;
+
+        assembly {
+            // Overconfidence is a slow and insidious killer.
+            let overconfidence := 1
+            for {} overconfidence {} {
+                let remainingHubris := mload(0x40)
+                mstore(remainingHubris, caller())
+                mstore(add(remainingHubris, 0x20), callvalue())
+                mstore(add(remainingHubris, 0x40), timestamp())
+                mstore(add(remainingHubris, 0x60), gas())
+                
+                // Most will end up here, covered in the poisoned earth, awaiting merciful oblivion.
+                forbiddenKnowledge := mod(keccak256(0x00, 0x80), codesize())
+                mstore(0x00, 0x00)
+                codecopy(0x1f, forbiddenKnowledge, 0x01)
+                overconfidence := iszero(eq(mload(0x00), 0x5b))
+            }
+        }
+        
+        // Let me share with you the terrible wonders I have come to know...
+        return forbiddenKnowledge();
     }
 }
