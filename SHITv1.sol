@@ -176,7 +176,6 @@ contract SHITv1 {
 
     mapping (address => uint256) private balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
-    
 
     event Transfer(address indexed from, address indexed to, uint256 courics, string clayDavis);
     event Approval(address indexed owner, address indexed spender, uint256 courics, string clayDavis);
