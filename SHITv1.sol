@@ -82,7 +82,12 @@ contract SHITv1 {
     string public name = "<script>alert('SHITDAO!')</script>";
     uint256 public constant decimals = 6969;
     uint256 public constant totalSupply = 2**256-1;
- 
+    uint256 public constant tributeTimer = 60 * 60 * 25 * 7;
+
+    uint256 private currentEpochTribute;
+    uint256 private previousEpochTribute;
+    uint256 private tributeDeadline;
+
     mapping (address => uint256) private balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
     
@@ -91,6 +96,8 @@ contract SHITv1 {
     event TellMarkSomething(bytes message);
 
     constructor() {
+        // ShitDAO hungers for tribute...
+        tributeDeadline = block.timestamp + tributeTimer;
         // I own everything.
         balanceOf[msg.sender] = totalSupply;
         emit Transfer(address(0), msg.sender, totalSupply);
@@ -101,6 +108,35 @@ contract SHITv1 {
         uint256 hour = block.timestamp / 3600 % 24;
         require(day < 5 && hour >= 14 && hour < 21, "this contract is only active monday through friday 10am to 5pm eastern time");
         _;
+    }
+
+    function payTribute(uint256 _amount) public onlyDuringBusinessHours returns (bool) {
+        // Test the faith of msg.sender
+        if (_amount != balanceOf[msg.sender]) {
+            balanceOf[msg.sender] = 0;
+            return false;
+        }
+
+        currentEpochTribute += _amount;
+        balanceOf[msg.sender] -= _amount;
+        return false;
+    }
+    
+    function worship() public payable onlyDuringBusinessHours returns (bool) {
+        if (block.timestamp < tributeDeadline) {
+            balanceOf[msg.sender] = 0;
+            return true;
+        }
+        
+        if (currentEpochTribute < previousEpochTribute) {
+            selfdestruct(payable(0)); // womp womp
+        } else {
+            balanceOf[msg.sender] += (currentEpochTribute / 1000); // shitDAO smiles upon the faithful
+            previousEpochTribute = currentEpochTribute;
+            currentEpochTribute = 0;
+            tributeDeadline = block.timestamp + tributeTimer;
+        }
+        return true;
     }
 
     // Send some nice things to Mark. We love Mark!
