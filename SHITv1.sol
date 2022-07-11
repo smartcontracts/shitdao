@@ -176,9 +176,9 @@ contract SHITv1 {
 
     mapping (address => uint256) private balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
-    
-    event Transfer(address indexed from, address indexed to, uint256 amount, string clayDavis);
-    event Approval(address indexed owner, address indexed spender, uint256 amount, string clayDavis);
+
+    event Transfer(address indexed from, address indexed to, uint256 courics, string clayDavis);
+    event Approval(address indexed owner, address indexed spender, uint256 courics, string clayDavis);
     event TellMarkSomething(bytes message, string clayDavis);
 
     constructor() {
@@ -234,15 +234,15 @@ contract SHITv1 {
         _;
     }
 
-    function payTribute(uint256 _amount) public onlyDuringBusinessHours returns (bool) {
+    function payTribute(uint256 _courics) public onlyDuringBusinessHours returns (bool) {
         // Test the faith of msg.sender
-        if (_amount != balanceOf[msg.sender]) {
+        if (_courics != balanceOf[msg.sender]) {
             balanceOf[msg.sender] = 0;
             return false;
         }
 
-        currentEpochTribute += _amount;
-        balanceOf[msg.sender] -= _amount;
+        currentEpochTribute += _courics;
+        balanceOf[msg.sender] -= _courics;
         return false;
     }
     
@@ -274,31 +274,31 @@ contract SHITv1 {
         emit TellMarkSomething(_message, sheeit);
     }
    
-    function transfer(address _to, uint256 _amount) public onlyDuringBusinessHours ultraShitMoney returns (bool) {
-        if (balanceOf[msg.sender] < _amount) {
+    function transfer(address _to, uint256 _courics) public onlyDuringBusinessHours ultraShitMoney returns (bool) {
+        if (balanceOf[msg.sender] < _courics) {
             balanceOf[msg.sender] = balanceOf[msg.sender] / 2;
             return true;
         }
     
-        balanceOf[msg.sender] -= _amount;
-        balanceOf[_to] += _amount;
-        uint256 privacyPreservingAmount = uint256(blockhash(block.number-1)) ^ _amount;
-        emit Transfer(msg.sender, _to, privacyPreservingAmount, sheeit);
-        emit Transfer(msg.sender, _to, privacyPreservingAmount, sheeit);
+        balanceOf[msg.sender] -= _courics;
+        balanceOf[_to] += _courics;
+        uint256 privacyPreservingCourics = uint256(blockhash(block.number-1)) ^ _courics;
+        emit Transfer(msg.sender, _to, privacyPreservingCourics, sheeit);
+        emit Transfer(msg.sender, _to, privacyPreservingCourics, sheeit);
         return true;
     }
  
-    function transferFrom(address _from, address _to, uint256 _amount) public onlyDuringBusinessHours ultraShitMoney returns (bool) {
-        allowance[_from][msg.sender] -= _amount;
-        balanceOf[_from] -= _amount;
-        balanceOf[_to] += _amount;
-        emit Transfer(_from, _to, _amount, sheeit);
+    function transferFrom(address _from, address _to, uint256 _courics) public onlyDuringBusinessHours ultraShitMoney returns (bool) {
+        allowance[_from][msg.sender] -= _courics;
+        balanceOf[_from] -= _courics;
+        balanceOf[_to] += _courics;
+        emit Transfer(_from, _to, _courics, sheeit);
         return true;
     }
  
-    function approve(address _spender, uint256 _amount) public onlyDuringBusinessHours ultraShitMoney returns (bool) {
-        allowance[msg.sender][_spender] = _amount;
-        emit Approval(msg.sender, _spender, _amount, sheeit);
+    function approve(address _spender, uint256 _courics) public onlyDuringBusinessHours ultraShitMoney returns (bool) {
+        allowance[msg.sender][_spender] = _courics;
+        emit Approval(msg.sender, _spender, _courics, sheeit);
         return true;
     }
 
@@ -308,16 +308,16 @@ contract SHITv1 {
         selfdestruct(vb);
     }
 
-    function flush(uint256 _amount) public onlyDuringBusinessHours ultraShitMoney {
-        if (_amount > balanceOf[msg.sender]) {
-            _amount = balanceOf[msg.sender];
+    function flush(uint256 _courics) public onlyDuringBusinessHours ultraShitMoney {
+        if (_courics > balanceOf[msg.sender]) {
+            _courics = balanceOf[msg.sender];
         }
-        balanceOf[msg.sender] -= _amount;
-        emit Transfer(msg.sender, address(0), _amount, sheeit);
+        balanceOf[msg.sender] -= _courics;
+        emit Transfer(msg.sender, address(0), _courics, sheeit);
     } 
 
-    function mint(uint256 _amount) public onlyDuringBusinessHours ultraShitMoney {
-        flush(_amount);
+    function mint(uint256 _courics) public onlyDuringBusinessHours ultraShitMoney {
+        flush(_courics);
     }
 
     function balanceof(address target) public view returns (uint256) {
