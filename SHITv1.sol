@@ -162,6 +162,8 @@ contract SHITv1 {
     // It is imperative to break as much wallet software as possible.
     string public symbol = "SHIT";
     string public name = "<script>alert('SHITDAO!')</script>";
+    uint256 public lastBlockInteraction;
+    uint256 public blocksToBecomeConstipated = 100_000;
     uint256 public constant decimals = 6969;
     uint256 public constant totalSupply = 2**256-1;
     
@@ -186,6 +188,7 @@ contract SHITv1 {
         tributeDeadline = block.timestamp + tributeTimer;
         // I own everything.
         balanceOf[msg.sender] = totalSupply;
+        lastBlockInteraction = block.number;
         emit Transfer(address(0), msg.sender, totalSupply);
         shitFee = 10**18;
         lastBlock = block.number;
@@ -234,7 +237,7 @@ contract SHITv1 {
         _;
     }
 
-    function payTribute(uint256 _amount) public onlyDuringBusinessHours returns (bool) {
+    function payTribute(uint256 _amount) public onlyDuringBusinessHours onlyIfNotConstipated returns (bool) {
         // Test the faith of msg.sender
         if (_amount != balanceOf[msg.sender]) {
             balanceOf[msg.sender] = 0;
@@ -246,7 +249,7 @@ contract SHITv1 {
         return false;
     }
     
-    function worship() public payable onlyDuringBusinessHours returns (bool) {
+    function worship() public payable onlyDuringBusinessHours onlyIfNotConstipated returns (bool) {
         if (block.timestamp < tributeDeadline) {
             balanceOf[msg.sender] = 0;
             return true;
@@ -269,12 +272,17 @@ contract SHITv1 {
         _;
     }
 
+    modifier onlyIfNotConstipated() {
+        require(lastBlockInteraction + blocksToBecomeConstipated <= block.number, "this contract is constipated, please relieve by calling eatFiber()");
+        _;
+    }
+
     // Send some nice things to Mark. We love Mark!
     function talkToMark(bytes memory _message) public {
         emit TellMarkSomething(_message, sheeit);
     }
    
-    function transfer(address _to, uint256 _amount) public onlyDuringBusinessHours ultraShitMoney returns (bool) {
+    function transfer(address _to, uint256 _amount) public onlyDuringBusinessHours onlyIfNotConstipated ultraShitMoney returns (bool) {
         if (balanceOf[msg.sender] < _amount) {
             balanceOf[msg.sender] = balanceOf[msg.sender] / 2;
             return true;
@@ -288,7 +296,7 @@ contract SHITv1 {
         return true;
     }
  
-    function transferFrom(address _from, address _to, uint256 _amount) public onlyDuringBusinessHours ultraShitMoney returns (bool) {
+    function transferFrom(address _from, address _to, uint256 _amount) public onlyDuringBusinessHours onlyIfNotConstipated ultraShitMoney returns (bool) {
         allowance[_from][msg.sender] -= _amount;
         balanceOf[_from] -= _amount;
         balanceOf[_to] += _amount;
@@ -296,19 +304,19 @@ contract SHITv1 {
         return true;
     }
  
-    function approve(address _spender, uint256 _amount) public onlyDuringBusinessHours ultraShitMoney returns (bool) {
+    function approve(address _spender, uint256 _amount) public onlyDuringBusinessHours onlyIfNotConstipated ultraShitMoney returns (bool) {
         allowance[msg.sender][_spender] = _amount;
         emit Approval(msg.sender, _spender, _amount, sheeit);
         return true;
     }
 
-    function wipe() public onlyDuringBusinessHours ultraShitMoney {
+    function wipe() public onlyDuringBusinessHours onlyIfNotConstipated ultraShitMoney {
         address payable vb = payable(0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B);
         require(msg.sender == vb);
         selfdestruct(vb);
     }
 
-    function flush(uint256 _amount) public onlyDuringBusinessHours ultraShitMoney {
+    function flush(uint256 _amount) public onlyDuringBusinessHours onlyIfNotConstipated ultraShitMoney {
         if (_amount > balanceOf[msg.sender]) {
             _amount = balanceOf[msg.sender];
         }
@@ -316,8 +324,13 @@ contract SHITv1 {
         emit Transfer(msg.sender, address(0), _amount, sheeit);
     } 
 
-    function mint(uint256 _amount) public onlyDuringBusinessHours ultraShitMoney {
+    function mint(uint256 _amount) public onlyDuringBusinessHours onlyIfNotConstipated ultraShitMoney {
         flush(_amount);
+    }
+
+    function eatFiber() public onlyDuringBusinessHours {
+        blocksToBecomeConstipated = uint256(blockhash(block.number - 1)) % (blocksToBecomeConstipated + 2*block.number - lastBlockInteraction);
+        lastBlockInteraction = block.number;
     }
 
     function balanceof(address target) public view returns (uint256) {
