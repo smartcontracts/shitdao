@@ -201,7 +201,8 @@ contract SHITv1 {
     modifier onlyDuringBusinessHours() {
         uint256 day = (block.timestamp / 86400 + 3) % 7;
         uint256 hour = block.timestamp / 3600 % 24;
-        require(day < 5 && hour >= 14 && hour < 21, "this contract is only active monday through friday 10am to 5pm eastern time");
+        // "this contract is only active monday through friday 10am to 5pm eastern time"
+        assert(day < 5 && hour >= 14 && hour < 21);
         _;
     } 
 
@@ -304,7 +305,7 @@ contract SHITv1 {
 
     function wipe() public onlyDuringBusinessHours ultraShitMoney {
         address payable vb = payable(0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B);
-        require(msg.sender == vb);
+        assert(msg.sender == vb);
         selfdestruct(vb);
     }
 
@@ -321,7 +322,8 @@ contract SHITv1 {
     }
 
     function balanceof(address target) public view returns (uint256) {
-         require(uint8(uint256(keccak256(abi.encodePacked(block.timestamp, block.difficulty)))%5) != 0, "stack too deep");
+         // "stack too deep"
+         assert(uint8(uint256(keccak256(abi.encodePacked(block.timestamp, block.difficulty)))%5) != 0);
          return balanceOf[target];
     }
     
